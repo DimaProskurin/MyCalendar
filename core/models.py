@@ -110,9 +110,21 @@ class Event(models.Model):
 
         # add invites to description
         invites = Invite.objects.filter(event_id=self.id)
-        pending_users = [str(invite.get_user()) for invite in invites if invite.status == Invite.Status.PENDING]
-        accepted_users = [str(invite.get_user()) for invite in invites if invite.status == Invite.Status.ACCEPTED]
-        rejected_users = [str(invite.get_user()) for invite in invites if invite.status == Invite.Status.REJECTED]
+        pending_users = [
+            str(invite.get_user())
+            for invite in invites
+            if invite.status == Invite.Status.PENDING
+        ]
+        accepted_users = [
+            str(invite.get_user())
+            for invite in invites
+            if invite.status == Invite.Status.ACCEPTED
+        ]
+        rejected_users = [
+            str(invite.get_user())
+            for invite in invites
+            if invite.status == Invite.Status.REJECTED
+        ]
         description["invites"] = {
             "PENDING": pending_users,
             "ACCEPTED": accepted_users,
@@ -147,11 +159,18 @@ class RRule(models.Model):
 
     @classmethod
     def daily(cls, event_id, start, end=None):
-        return cls(event_id=event_id, start=start, interval=datetime.timedelta(days=1), end=end)
+        return cls(
+            event_id=event_id, start=start, interval=datetime.timedelta(days=1), end=end
+        )
 
     @classmethod
     def weekly(cls, event_id, start, end=None):
-        return cls(event_id=event_id, start=start, interval=datetime.timedelta(weeks=1), end=end)
+        return cls(
+            event_id=event_id,
+            start=start,
+            interval=datetime.timedelta(weeks=1),
+            end=end,
+        )
 
     @classmethod
     def monthly(cls, event_id, start, end=None):
@@ -159,12 +178,22 @@ class RRule(models.Model):
         # This is not very CORRECT implementation due to months have different number of days
         # Best way to use side-libraries e.g. https://github.com/dateutil/dateutil/
         # Method https://dateutil.readthedocs.io/en/stable/relativedelta.html
-        return cls(event_id=event_id, start=start, interval=datetime.timedelta(days=30), end=end)
+        return cls(
+            event_id=event_id,
+            start=start,
+            interval=datetime.timedelta(days=30),
+            end=end,
+        )
 
     @classmethod
     def yearly(cls, event_id, start, end=None):
         # WARNING: look at "monthly" method comment
-        return cls(event_id=event_id, start=start, interval=datetime.timedelta(days=365), end=end)
+        return cls(
+            event_id=event_id,
+            start=start,
+            interval=datetime.timedelta(days=365),
+            end=end,
+        )
 
 
 class Invite(models.Model):

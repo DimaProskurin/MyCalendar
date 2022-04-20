@@ -8,75 +8,169 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Calendar',
+            name="Calendar",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=100)),
-                ('description', models.CharField(blank=True, max_length=1024)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=100)),
+                ("description", models.CharField(blank=True, max_length=1024)),
             ],
         ),
         migrations.CreateModel(
-            name='Event',
+            name="Event",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=100)),
-                ('description', models.CharField(blank=True, max_length=1024)),
-                ('start', models.DateTimeField()),
-                ('end', models.DateTimeField()),
-                ('is_recurring', models.BooleanField(default=False)),
-                ('is_private', models.BooleanField(default=False)),
-                ('calendars', models.ManyToManyField(to='core.calendar')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=100)),
+                ("description", models.CharField(blank=True, max_length=1024)),
+                ("start", models.DateTimeField()),
+                ("end", models.DateTimeField()),
+                ("is_recurring", models.BooleanField(default=False)),
+                ("is_private", models.BooleanField(default=False)),
+                ("calendars", models.ManyToManyField(to="core.calendar")),
             ],
         ),
         migrations.CreateModel(
-            name='User',
+            name="User",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('email', models.EmailField(max_length=254)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("email", models.EmailField(max_length=254)),
             ],
         ),
         migrations.CreateModel(
-            name='RRule',
+            name="RRule",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('start', models.DateTimeField()),
-                ('interval', models.DurationField()),
-                ('end', models.DateTimeField(blank=True, default=None, null=True)),
-                ('event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.event')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("start", models.DateTimeField()),
+                ("interval", models.DurationField()),
+                ("end", models.DateTimeField(blank=True, default=None, null=True)),
+                (
+                    "event",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.event"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Invite',
+            name="Invite",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(choices=[('PE', 'Pending'), ('AC', 'Accepted'), ('RE', 'Rejected')], default='PE', max_length=2)),
-                ('event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.event')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.user')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("PE", "Pending"),
+                            ("AC", "Accepted"),
+                            ("RE", "Rejected"),
+                        ],
+                        default="PE",
+                        max_length=2,
+                    ),
+                ),
+                (
+                    "event",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.event"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.user"
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='event',
-            name='owner',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.user'),
+            model_name="event",
+            name="owner",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="core.user"
+            ),
         ),
         migrations.CreateModel(
-            name='CalendarPermission',
+            name="CalendarPermission",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('action', models.CharField(choices=[('RE', 'Read'), ('ED', 'Edit')], default='RE', max_length=2)),
-                ('calendar', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.calendar')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.user')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "action",
+                    models.CharField(
+                        choices=[("RE", "Read"), ("ED", "Edit")],
+                        default="RE",
+                        max_length=2,
+                    ),
+                ),
+                (
+                    "calendar",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.calendar"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.user"
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='calendar',
-            name='owner',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.user'),
+            model_name="calendar",
+            name="owner",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="core.user"
+            ),
         ),
     ]

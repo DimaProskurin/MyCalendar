@@ -55,7 +55,9 @@ def create_event(request):
 
     # validate start & end
     if start is None or end is None:
-        return HttpResponseBadRequest(f"Your {body_data['start']} and {body_data['end']} aren't valid format")
+        return HttpResponseBadRequest(
+            f"Your {body_data['start']} and {body_data['end']} aren't valid format"
+        )
     if start > end:
         return HttpResponseBadRequest("End date should be greater than start date")
 
@@ -99,7 +101,9 @@ def create_event(request):
         }
         for repeat in repeats:
             if repeat not in default_rrules:
-                return HttpResponseBadRequest(f"Repeat value {repeat} is not valid. Valid is {default_rrules.keys()}")
+                return HttpResponseBadRequest(
+                    f"Repeat value {repeat} is not valid. Valid is {default_rrules.keys()}"
+                )
         for repeat in repeats:
             default_rrules[repeat].save()
 

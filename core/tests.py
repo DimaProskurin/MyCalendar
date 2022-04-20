@@ -36,17 +36,26 @@ class ModelTests(TestCase):
         start, end = next(instances)
         self.assertTupleEqual(
             (start, end),
-            (parse_datetime("2022-04-19T15:00:00Z"), parse_datetime("2022-04-19T16:30:00Z")),
+            (
+                parse_datetime("2022-04-19T15:00:00Z"),
+                parse_datetime("2022-04-19T16:30:00Z"),
+            ),
         )
         start, end = next(instances)
         self.assertTupleEqual(
             (start, end),
-            (parse_datetime("2022-04-20T15:00:00Z"), parse_datetime("2022-04-20T16:30:00Z")),
+            (
+                parse_datetime("2022-04-20T15:00:00Z"),
+                parse_datetime("2022-04-20T16:30:00Z"),
+            ),
         )
         start, end = next(instances)
         self.assertTupleEqual(
             (start, end),
-            (parse_datetime("2022-04-21T15:00:00Z"), parse_datetime("2022-04-21T16:30:00Z")),
+            (
+                parse_datetime("2022-04-21T15:00:00Z"),
+                parse_datetime("2022-04-21T16:30:00Z"),
+            ),
         )
 
     def test_pending_invite(self):
@@ -87,7 +96,10 @@ class ModelTests(TestCase):
         start, end = next(slots)
         self.assertTupleEqual(
             (start, end),
-            (parse_datetime("2022-04-19T15:00:00Z"), parse_datetime("2022-04-19T16:30:00Z")),
+            (
+                parse_datetime("2022-04-19T15:00:00Z"),
+                parse_datetime("2022-04-19T16:30:00Z"),
+            ),
         )
 
 
@@ -118,7 +130,7 @@ class CreateViewsTests(TestCase):
             "owner_email": "johndoe@gmail.com",
             "is_recurring": "True",
             "repeats": ["daily"],
-            "invited_emails": ["guest@gmail.com"]
+            "invited_emails": ["guest@gmail.com"],
         }
 
         # no users exist -> error while creating
@@ -192,7 +204,9 @@ class InfoViewsTests(TestCase):
                 "owner": "John Doe (johndoe@gmail.com)",
                 "is_recurring": True,
                 "is_private": False,
-                "repeats": ["Repeat start=2022-04-19 15:00:00+00:00 with interval=1 day, 0:00:00"],
+                "repeats": [
+                    "Repeat start=2022-04-19 15:00:00+00:00 with interval=1 day, 0:00:00"
+                ],
                 "invites": {
                     "PENDING": ["Guest (guest@gmail.com)"],
                     "ACCEPTED": [],
@@ -223,12 +237,16 @@ class InfoViewsTests(TestCase):
         self.assertEqual(200, response.status_code)
         self.assertDictEqual(
             {
-                "invites": [f"id={invite.id} user=Guest (guest@gmail.com) event=Event example status=PE"],
+                "invites": [
+                    f"id={invite.id} user=Guest (guest@gmail.com) event=Event example status=PE"
+                ],
             },
             response.json(),
         )
 
-        response = self.client.get(f"/api/info/user/{guest_user.id}/invites?status=ACCEPTED")
+        response = self.client.get(
+            f"/api/info/user/{guest_user.id}/invites?status=ACCEPTED"
+        )
         self.assertEqual(200, response.status_code)
         self.assertDictEqual({"invites": []}, response.json())
 
@@ -247,15 +265,19 @@ class InfoViewsTests(TestCase):
         rrule = RRule.daily(event_id=event.id, start=event.start)
         rrule.save()
 
-        response = self.client.get(f"/api/info/user/{user.id}/events?from=2022-04-15T00:00:00&till=2022-04-24T00:00:00")
+        response = self.client.get(
+            f"/api/info/user/{user.id}/events?from=2022-04-15T00:00:00&till=2022-04-24T00:00:00"
+        )
         self.assertEqual(200, response.status_code)
         self.assertDictEqual(
             {
-                "events": ["Start=2022-04-19 15:00:00+00:00, End=2022-04-19 16:30:00+00:00, Title=Event example",
-                           "Start=2022-04-20 15:00:00+00:00, End=2022-04-20 16:30:00+00:00, Title=Event example",
-                           "Start=2022-04-21 15:00:00+00:00, End=2022-04-21 16:30:00+00:00, Title=Event example",
-                           "Start=2022-04-22 15:00:00+00:00, End=2022-04-22 16:30:00+00:00, Title=Event example",
-                           "Start=2022-04-23 15:00:00+00:00, End=2022-04-23 16:30:00+00:00, Title=Event example", ]
+                "events": [
+                    "Start=2022-04-19 15:00:00+00:00, End=2022-04-19 16:30:00+00:00, Title=Event example",
+                    "Start=2022-04-20 15:00:00+00:00, End=2022-04-20 16:30:00+00:00, Title=Event example",
+                    "Start=2022-04-21 15:00:00+00:00, End=2022-04-21 16:30:00+00:00, Title=Event example",
+                    "Start=2022-04-22 15:00:00+00:00, End=2022-04-22 16:30:00+00:00, Title=Event example",
+                    "Start=2022-04-23 15:00:00+00:00, End=2022-04-23 16:30:00+00:00, Title=Event example",
+                ]
             },
             response.json(),
         )
@@ -298,7 +320,9 @@ class TimetableViewsTests(TestCase):
             status=Invite.Status.ACCEPTED,
         )
 
-        response = self.client.get(f"/api/timetable/free_time_slot?user_ids={owner.id},{guest.id}&duration=30:00")
+        response = self.client.get(
+            f"/api/timetable/free_time_slot?user_ids={owner.id},{guest.id}&duration=30:00"
+        )
         self.assertEqual(200, response.status_code)
         self.assertDictEqual(
             {"start": "2022-04-19T16:30:00Z", "end": "2022-04-19T17:00:00Z"},

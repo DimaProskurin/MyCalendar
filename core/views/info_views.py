@@ -36,7 +36,7 @@ def info_user_invites(request, userid):
         invites = user.get_all_invites()
     return JsonResponse(
         {"invites": [str(invite) for invite in invites]},
-        json_dumps_params={"indent": 3}
+        json_dumps_params={"indent": 3},
     )
 
 
@@ -63,8 +63,6 @@ def info_user_events(request, userid):
     events = sorted(events, key=lambda it: it[0][0])
     pretty_events = []
     for (start, end), event in events:
-        pretty_events.append(
-            f"Start={start}, End={end}, Title={str(event)}"
-        )
+        pretty_events.append(f"Start={start}, End={end}, Title={str(event)}")
 
     return JsonResponse({"events": pretty_events}, json_dumps_params={"indent": 3})
