@@ -51,21 +51,23 @@ curl --request POST 'localhost:8000/api/create/event' \
 ```
 
 ### Info about user
-  * endpoint `api/info/user/<int:id>`
+  * endpoint `api/info/user/<int:user_id>`
   * GET HTTP query
 ```shell
 curl --request GET 'localhost:8000/api/info/user/1'
 ```
 
-### Detail info about event
-  * endpoint: `api/info/event/<int:id>`
+### Show detail info about event
+  * endpoint: `api/info/user/<int:user_id>/event/<int:event_id>`
   * GET HTTP query
+  * `user_id` param specifies who is asking for info about the event. 
+If the event is private for user_id then only open2world part will be shown 
 ```shell
-curl --request GET 'localhost:8000/api/info/event/1'
+curl --request GET 'localhost:8000/api/info/user/1/event/2'
 ```
 
 ### Accept or Reject invite to event
-  * endpoint `api/update/invite/<int:id>`
+  * endpoint `api/update/invite/<int:invite_id>`
   * PUT HTTP query
   * New status for invite (ACCEPTED / REJECTED) should be provided as parameter `status`
 ```shell
@@ -73,7 +75,7 @@ curl --request PUT 'localhost:8000/api/update/invite/2?status=REJECTED'
 ```
 
 ### Look up your invites list
-  * endpoint `api/info/user/<int:userid>/invites`
+  * endpoint `api/info/user/<int:user_id>/invites`
   * GET HTTP query
   * Filter parameter `status` can specify type of invites to return. By default all invites are returned
 ```shell
@@ -81,8 +83,8 @@ curl --request GET 'localhost:8000/api/info/user/1/invites'
 curl --request GET 'localhost:8000/api/info/user/1/invites?status=PENDING'
 ```
 
-### Show all events for user by specified period of time
-  * endpoint `api/info/user/<int:userid>/events`
+### Show all events instances (like timetable) of user by specified period of time
+  * endpoint `api/info/user/<int:user_id>/events`
   * GET HTTP query
   * Params `from` and `till` should be provided
 ```shell

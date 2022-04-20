@@ -4,15 +4,21 @@ from django.views.decorators.csrf import csrf_exempt
 from core.models import Invite
 
 
+def exist_invite(invite_id):
+    invite_query = Invite.objects.filter(id=invite_id)
+    if len(invite_query) == 0:
+        return None, HttpResponseBadRequest(f"No invite with such id = {invite_id}")
+    return invite_query[0], None
+
+
 @csrf_exempt
-def update_invite(request, id):
+def update_invite(request, invite_id):
     if request.method != "PUT":
         return HttpResponseBadRequest("The HTTP request should be PUT type")
 
-    invite_query = Invite.objects.filter(id=id)
-    if len(invite_query) == 0:
-        return HttpResponseBadRequest(f"No invite with such id = {id}")
-    invite = invite_query[0]
+    invite, err = exist_invite(invite_id)
+    if err:
+        return err
 
     new_status = request.GET.get("status")
     if new_status is None:

@@ -169,7 +169,7 @@ class InfoViewsTests(TestCase):
         self.assertDictEqual({"user": "John Doe (johndoe@gmail.com)"}, response.json())
 
     def test_info_event(self):
-        response = self.client.get("/api/info/event/1")
+        response = self.client.get("/api/info/user/1/event/1")
         self.assertEqual(400, response.status_code)
 
         user = User.objects.create(name="John Doe", email="johndoe@gmail.com")
@@ -192,7 +192,7 @@ class InfoViewsTests(TestCase):
             event_id=event.id,
         )
 
-        response = self.client.get(f"/api/info/event/{event.id}")
+        response = self.client.get(f"/api/info/user/{user.id}/event/{event.id}")
         self.assertEqual(200, response.status_code)
 
         self.assertDictEqual(

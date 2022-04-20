@@ -87,11 +87,21 @@ class Event(models.Model):
     def get_owner(self):
         return User.objects.filter(id=self.owner.id)[0]
 
+    def get_related_user_ids(self):
+        owner_id = self.owner_id
+        invited_user_ids = [
+            invite.user_id for invite in Invite.objects.filter(event_id=self.id)
+        ]
+        return [owner_id] + invited_user_ids
+
+    def get_rrules(self):
+        return RRule.objects.filter(event_id=self.id)
+
     def get_instances(self):
         if not self.is_recurring:
             yield self.start, self.end
         else:
-            rrules = RRule.objects.filter(event_id=self.id)
+            rrules = self.get_rrules()
             yield from min_stream([rrule.get_repeats() for rrule in rrules])
 
     def deep_description(self):
@@ -105,7 +115,7 @@ class Event(models.Model):
             "is_private": self.is_private,
         }
         if self.is_recurring:
-            rrules = RRule.objects.filter(event_id=self.id)
+            rrules = self.get_rrules()
             description["repeats"] = [str(rrule) for rrule in rrules]
 
         # add invites to description
@@ -131,6 +141,19 @@ class Event(models.Model):
             "REJECTED": rejected_users,
         }
 
+        return description
+
+    def hidden_description(self):
+        description = {
+            "owner": str(self.get_owner()),
+            "start": self.start,
+            "end": self.end,
+            "is_recurring": self.is_recurring,
+            "is_private": self.is_private,
+        }
+        if self.is_recurring:
+            rrules = self.get_rrules()
+            description["repeats"] = [str(rrule) for rrule in rrules]
         return description
 
     def __str__(self):

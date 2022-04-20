@@ -7,12 +7,12 @@ urlpatterns = [
     path("create/user", create_views.create_user),
     path("create/event", create_views.create_event),
     # info views
-    path("info/event/<int:id>", info_views.info_event),
-    path("info/user/<int:id>", info_views.info_user),
-    path("info/user/<int:userid>/invites", info_views.info_user_invites),
-    path("info/user/<int:userid>/events", info_views.info_user_events),
+    path("info/user/<int:user_id>/event/<int:event_id>", info_views.info_event),
+    path("info/user/<int:user_id>", info_views.info_user),
+    path("info/user/<int:user_id>/invites", info_views.info_user_invites),
+    path("info/user/<int:user_id>/events", info_views.info_user_events),
     # update views
-    path("update/invite/<int:id>", update_views.update_invite),
+    path("update/invite/<int:invite_id>", update_views.update_invite),
     # timetable views
     path("timetable/free_time_slot", timetable_views.get_first_free_time_slot),
 ]
