@@ -1,3 +1,6 @@
+[![CI](https://github.com/DimaProskurin/MyCalendar/actions/workflows/main.yml/badge.svg)](https://github.com/DimaProskurin/MyCalendar/actions/workflows/main.yml) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+
 # MyCalendar
 
 This is a simple implementation of Calendar (aka Google Calendar)
