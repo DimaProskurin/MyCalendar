@@ -24,12 +24,9 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-      
-      # Check helloworld
-      - name: Run echo
-        run: echo "hello"
 
       # Runs a single command using the runners shell
-      - name: Run test script
-        run: ./run_tests.sh
-
+      - name: Run tests
+        run: |
+          docker compose up -d
+          docker compose run api poetry run python manage.py test
