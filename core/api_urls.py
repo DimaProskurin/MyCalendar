@@ -7,9 +7,9 @@ urlpatterns = [
     path("create/user", create_views.create_user),
     path("create/event", create_views.create_event),
     # info views
-    path("info/user/<int:user_id>/event/<int:event_id>", info_views.info_event),
+    path("info/event/<int:event_id>", info_views.info_event),
     path("info/user/<int:user_id>", info_views.info_user),
-    path("info/user/<int:user_id>/invites", info_views.info_user_invites),
+    path("info/invites", info_views.info_user_invites),
     path("info/user/<int:user_id>/events", info_views.info_user_events),
     # update views
     path("update/invite/<int:invite_id>", update_views.update_invite),

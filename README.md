@@ -25,11 +25,33 @@ Authored by Dmitrii Proskurin (dimapr117@gmail.com)
   * POST HTTP query
   * user description should be posted in body as JSON
 ```shell
-curl --request POST 'localhost:8000/api/create/user' \
+curl --request POST 'http://localhost:8000/api/create/user' \
 --data-raw '{
-    "name": "Guest",
-    "email": "guest@gmail.com"
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "johndoe@gmail.com",
+    "username": "johndoe",
+    "password": "mysecretpassword"
 }'
+```
+
+### Login
+  * endpoint: `/accounts/login`
+  * POST HTTP query
+  * user credentials should be posted in body as JSON
+```shell
+curl --request POST 'http://localhost:8000/accounts/login' \
+--data-raw '{
+    "username": "johndoe",
+    "password": "mysecretpassword"
+}'
+```
+
+### Logout
+  * endpoint: `/accounts/logout`
+  * GET HTTP query
+```shell
+curl --request GET 'http://localhost:8000/accounts/logout'
 ```
 
 ### Create event
@@ -43,7 +65,6 @@ curl --request POST 'localhost:8000/api/create/event' \
     "description": "This field is optional",
     "start": "2022-04-20T08:00:00",
     "end": "2022-04-20T10:00:00",
-    "owner_email": "dimapr117@gmail.com",
     "is_recurring": "True",
     "repeats": ["daily"],
     "invited_emails": ["guest@gmail.com"]
@@ -58,12 +79,11 @@ curl --request GET 'localhost:8000/api/info/user/1'
 ```
 
 ### Show detail info about event
-  * endpoint: `api/info/user/<int:user_id>/event/<int:event_id>`
+  * endpoint: `api/info/event/<int:event_id>`
   * GET HTTP query
-  * `user_id` param specifies who is asking for info about the event. 
-If the event is private for user_id then only open2world part will be shown 
+  * If the event is private for user then only partial info will be shown
 ```shell
-curl --request GET 'localhost:8000/api/info/user/1/event/2'
+curl --request GET 'localhost:8000/api/info/event/2'
 ```
 
 ### Accept or Reject invite to event
@@ -75,12 +95,12 @@ curl --request PUT 'localhost:8000/api/update/invite/2?status=REJECTED'
 ```
 
 ### Look up your invites list
-  * endpoint `api/info/user/<int:user_id>/invites`
+  * endpoint `api/info/invites`
   * GET HTTP query
   * Filter parameter `status` can specify type of invites to return. By default all invites are returned
 ```shell
-curl --request GET 'localhost:8000/api/info/user/1/invites'
-curl --request GET 'localhost:8000/api/info/user/1/invites?status=PENDING'
+curl --request GET 'localhost:8000/api/info/invites'
+curl --request GET 'localhost:8000/api/info/invites?status=PENDING'
 ```
 
 ### Show all events instances (like timetable) of user by specified period of time

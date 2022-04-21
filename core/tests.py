@@ -6,7 +6,12 @@ from core.models import Event, Invite, RRule, User
 
 class ModelTests(TestCase):
     def setUp(self):
-        user = User.objects.create(name="John Doe", email="johndoe@gmail.com")
+        user = User.objects.create(
+            first_name="John",
+            last_name="Doe",
+            email="johndoe@gmail.com",
+            username="johndoe",
+        )
         event = Event.objects.create(
             title="Test title",
             start=parse_datetime("2022-04-19T15:00:00Z"),
@@ -20,7 +25,9 @@ class ModelTests(TestCase):
         )
         rrule.save()
 
-        guest_user = User.objects.create(name="Guest", email="guest@gmail.com")
+        guest_user = User.objects.create(
+            first_name="Guest", email="guest@gmail.com", username="guest"
+        )
         Invite.objects.create(
             user_id=guest_user.id,
             event_id=event.id,
@@ -108,7 +115,13 @@ class CreateViewsTests(TestCase):
         response = self.client.post(
             "/api/create/user",
             content_type="application/json",
-            data={"name": "John Doe", "email": "johndoe@gmail.com"},
+            data={
+                "first_name": "John",
+                "last_name": "Doe",
+                "email": "johndoe@gmail.com",
+                "username": "johndoe",
+                "password": "mysecretpassword",
+            },
         )
         self.assertEqual(200, response.status_code)
         user = User.objects.get(email="johndoe@gmail.com")
@@ -118,7 +131,13 @@ class CreateViewsTests(TestCase):
         response = self.client.post(
             "/api/create/user",
             content_type="application/json",
-            data={"name": "John Doe", "email": "johndoe@gmail.com"},
+            data={
+                "first_name": "John",
+                "last_name": "Doe",
+                "email": "johndoe@gmail.com",
+                "username": "johndoe",
+                "password": "mysecretpassword",
+            },
         )
         self.assertEqual(400, response.status_code)
 
@@ -127,13 +146,12 @@ class CreateViewsTests(TestCase):
             "title": "Example event",
             "start": "2022-04-20T08:00:00",
             "end": "2022-04-20T10:00:00",
-            "owner_email": "johndoe@gmail.com",
             "is_recurring": "True",
             "repeats": ["daily"],
             "invited_emails": ["guest@gmail.com"],
         }
 
-        # no users exist -> error while creating
+        # no users exist & no login -> error while creating
         response = self.client.post(
             "/api/create/event",
             content_type="application/json",
@@ -141,9 +159,23 @@ class CreateViewsTests(TestCase):
         )
         self.assertEqual(400, response.status_code)
 
-        # create users and repeat
-        User.objects.create(name="John Doe", email="johndoe@gmail.com")
-        User.objects.create(name="Guest", email="guest@gmail.com")
+        # create users, login and repeat
+        user = User(
+            first_name="John",
+            last_name="Doe",
+            email="johndoe@gmail.com",
+            username="johndoe",
+        )
+        user.set_password("mysecretpassword")
+        user.save()
+        guest = User(first_name="Guest", email="guest@gmail.com", username="guest")
+        guest.set_password("mysecretpassword")
+        guest.save()
+        self.client.post(
+            "/accounts/login",
+            content_type="application/json",
+            data={"username": "johndoe", "password": "mysecretpassword"},
+        )
         response = self.client.post(
             "/api/create/event",
             content_type="application/json",
@@ -163,16 +195,33 @@ class InfoViewsTests(TestCase):
         response = self.client.get("/api/info/user/1")
         self.assertEqual(400, response.status_code)
 
-        user = User.objects.create(name="John Doe", email="johndoe@gmail.com")
+        user = User.objects.create(
+            first_name="John",
+            last_name="Doe",
+            email="johndoe@gmail.com",
+            username="johndoe",
+        )
         response = self.client.get(f"/api/info/user/{user.id}")
         self.assertEqual(200, response.status_code)
         self.assertDictEqual({"user": "John Doe (johndoe@gmail.com)"}, response.json())
 
     def test_info_event(self):
-        response = self.client.get("/api/info/user/1/event/1")
+        response = self.client.get("/api/info/event/1")
         self.assertEqual(400, response.status_code)
 
-        user = User.objects.create(name="John Doe", email="johndoe@gmail.com")
+        user = User(
+            first_name="John",
+            last_name="Doe",
+            email="johndoe@gmail.com",
+            username="johndoe",
+        )
+        user.set_password("mysecretpassword")
+        user.save()
+        self.client.post(
+            "/accounts/login",
+            content_type="application/json",
+            data={"username": "johndoe", "password": "mysecretpassword"},
+        )
         event = Event.objects.create(
             title="Event example",
             start=parse_datetime("2022-04-19T15:00:00Z"),
@@ -186,13 +235,15 @@ class InfoViewsTests(TestCase):
         )
         rrule.save()
 
-        guest_user = User.objects.create(name="Guest", email="guest@gmail.com")
+        guest = User(first_name="Guest", email="guest@gmail.com", username="guest")
+        guest.set_password("mysecretpassword")
+        guest.save()
         Invite.objects.create(
-            user_id=guest_user.id,
+            user_id=guest.id,
             event_id=event.id,
         )
 
-        response = self.client.get(f"/api/info/user/{user.id}/event/{event.id}")
+        response = self.client.get(f"/api/info/event/{event.id}")
         self.assertEqual(200, response.status_code)
 
         self.assertDictEqual(
@@ -217,23 +268,38 @@ class InfoViewsTests(TestCase):
         )
 
     def test_info_user_invites(self):
-        response = self.client.get("/api/info/user/1/invites")
+        response = self.client.get("/api/info/invites")
         self.assertEqual(400, response.status_code)
 
-        user = User.objects.create(name="John Doe", email="johndoe@gmail.com")
+        user = User(
+            first_name="John",
+            last_name="Doe",
+            email="johndoe@gmail.com",
+            username="johndoe",
+        )
+        user.set_password("mysecretpassword")
+        user.save()
         event = Event.objects.create(
             title="Event example",
             start=parse_datetime("2022-04-19T15:00:00Z"),
             end=parse_datetime("2022-04-19T16:30:00Z"),
             owner_id=user.id,
         )
-        guest_user = User.objects.create(name="Guest", email="guest@gmail.com")
+        guest = User(first_name="Guest", email="guest@gmail.com", username="guest")
+        guest.set_password("mysecretpassword")
+        guest.save()
         invite = Invite.objects.create(
-            user_id=guest_user.id,
+            user_id=guest.id,
             event_id=event.id,
         )
 
-        response = self.client.get(f"/api/info/user/{guest_user.id}/invites")
+        # login as guest
+        self.client.post(
+            "/accounts/login",
+            content_type="application/json",
+            data={"username": "guest", "password": "mysecretpassword"},
+        )
+        response = self.client.get(f"/api/info/invites")
         self.assertEqual(200, response.status_code)
         self.assertDictEqual(
             {
@@ -244,9 +310,7 @@ class InfoViewsTests(TestCase):
             response.json(),
         )
 
-        response = self.client.get(
-            f"/api/info/user/{guest_user.id}/invites?status=ACCEPTED"
-        )
+        response = self.client.get(f"/api/info/invites?status=ACCEPTED")
         self.assertEqual(200, response.status_code)
         self.assertDictEqual({"invites": []}, response.json())
 
@@ -254,7 +318,14 @@ class InfoViewsTests(TestCase):
         response = self.client.get("/api/info/user/1/events")
         self.assertEqual(400, response.status_code)
 
-        user = User.objects.create(name="John Doe", email="johndoe@gmail.com")
+        user = User(
+            first_name="John",
+            last_name="Doe",
+            email="johndoe@gmail.com",
+            username="johndoe",
+        )
+        user.set_password("mysecretpassword")
+        user.save()
         event = Event.objects.create(
             title="Event example",
             start=parse_datetime("2022-04-19T15:00:00Z"),
@@ -288,7 +359,14 @@ class UpdateViewsTests(TestCase):
         response = self.client.put("/api/update/invite/1")
         self.assertEqual(400, response.status_code)
 
-        user = User.objects.create(name="John Doe", email="johndoe@gmail.com")
+        user = User(
+            first_name="John",
+            last_name="Doe",
+            email="johndoe@gmail.com",
+            username="johndoe",
+        )
+        user.set_password("mysecretpassword")
+        user.save()
         event = Event.objects.create(
             title="Event example",
             start=parse_datetime("2022-04-19T15:00:00Z"),
@@ -298,6 +376,12 @@ class UpdateViewsTests(TestCase):
         invite = Invite.objects.create(event_id=event.id, user_id=user.id)
 
         self.assertEqual(Invite.Status.PENDING, invite.status)
+        # login as John Doe
+        self.client.post(
+            "/accounts/login",
+            content_type="application/json",
+            data={"username": "johndoe", "password": "mysecretpassword"},
+        )
         self.client.put(f"/api/update/invite/{invite.id}?status=ACCEPTED")
         invite.refresh_from_db()
         self.assertEqual(Invite.Status.ACCEPTED, invite.status)
@@ -305,14 +389,23 @@ class UpdateViewsTests(TestCase):
 
 class TimetableViewsTests(TestCase):
     def test_free_time_slot(self):
-        owner = User.objects.create(name="John Doe", email="johndoe@gmail.com")
-        guest = User.objects.create(name="Guest", email="guest@gmail.com")
+        user = User(
+            first_name="John",
+            last_name="Doe",
+            email="johndoe@gmail.com",
+            username="johndoe",
+        )
+        user.set_password("mysecretpassword")
+        user.save()
+        guest = User(first_name="Guest", email="guest@gmail.com", username="guest")
+        guest.set_password("mysecretpassword")
+        guest.save()
 
         event = Event.objects.create(
             title="Event example",
             start=parse_datetime("2022-04-19T15:00:00Z"),
             end=parse_datetime("2022-04-19T16:30:00Z"),
-            owner_id=owner.id,
+            owner_id=user.id,
         )
         Invite.objects.create(
             user_id=guest.id,
@@ -321,7 +414,7 @@ class TimetableViewsTests(TestCase):
         )
 
         response = self.client.get(
-            f"/api/timetable/free_time_slot?user_ids={owner.id},{guest.id}&duration=30:00"
+            f"/api/timetable/free_time_slot?user_ids={user.id},{guest.id}&duration=30:00"
         )
         self.assertEqual(200, response.status_code)
         self.assertDictEqual(

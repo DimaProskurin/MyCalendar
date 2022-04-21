@@ -2,13 +2,21 @@ import datetime
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import User as DjangoUser
 
 from core.common.min_generator import min_stream
 
 
-class User(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.EmailField()
+class User(DjangoUser):
+    class Meta:
+        proxy = True
+
+    @property
+    def name(self):
+        if self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        else:
+            return self.first_name
 
     def get_owned_events(self):
         return Event.objects.filter(owner_id=self.id)
